@@ -328,6 +328,102 @@
             border: 1px solid var(--accent-border);
         }
 
+        /* ─── Agent expand panels ────────────────────────── */
+        .agent { cursor: pointer; position: relative; }
+        .agent::after {
+            content: '▸ View brief';
+            position: absolute;
+            bottom: 0.7rem;
+            right: 1.2rem;
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            font-family: var(--mono);
+            transition: color 0.18s;
+        }
+        .agent:hover::after { color: var(--accent); }
+        .agent.expanded::after { content: '▾ Hide brief'; color: var(--accent); }
+
+        .agent-detail {
+            display: none;
+            grid-column: 1 / -1;
+            background: var(--code-bg);
+            border-top: 1px solid var(--border);
+            padding: 2rem 2.2rem;
+            font-size: 0.82rem;
+            line-height: 1.75;
+            color: var(--text-muted);
+        }
+        .agent-detail.visible { display: block; }
+
+        .agent-detail h4 {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            margin: 1.6rem 0 0.5rem;
+        }
+        .agent-detail h4:first-child { margin-top: 0; }
+
+        .agent-detail p { margin-bottom: 0.6rem; }
+
+        .agent-detail ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 0.8rem;
+        }
+        .agent-detail ul li {
+            padding: 0.2rem 0 0.2rem 1rem;
+            position: relative;
+        }
+        .agent-detail ul li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-border);
+        }
+
+        .agent-detail .detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.6rem 0 1rem;
+            font-size: 0.78rem;
+        }
+        .agent-detail .detail-table th {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            padding: 0.4rem 0.8rem;
+            border-bottom: 1px solid var(--border-bright);
+        }
+        .agent-detail .detail-table td {
+            padding: 0.35rem 0.8rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+        .agent-detail .detail-table td:first-child {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .agent-detail code {
+            font-family: var(--mono);
+            font-size: 0.75rem;
+            color: #82b1ff;
+            background: rgba(130, 177, 255, 0.08);
+            padding: 0.1rem 0.35rem;
+            border-radius: 3px;
+        }
+
+        .detail-role {
+            font-size: 0.85rem;
+            color: var(--text);
+            font-style: italic;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
         /* ─── Agent grid ──────────────────────────────────── */
         .agents {
             display: grid;
@@ -688,24 +784,18 @@
     <div class="section-label">The agents</div>
     <h2>Ten lenses on every question</h2>
     <p class="section-desc">Each agent declares its bias upfront. The synthesis judge knows where to discount and cross-reference.</p>
-    <div class="agents">
-        <div class="agent">
+    <div class="agents" id="agents-grid">
+        <!-- 1. Official Docs -->
+        <div class="agent" data-agent="official-docs" onclick="toggleAgent(this)">
             <div class="agent-header">
                 <div class="agent-name">Official Docs</div>
                 <div class="agent-src">docs.databricks.com</div>
             </div>
             <div class="agent-desc">What Databricks has shipped, documented, and publicly committed to. Covers feature scope, known limitations, API surface, pricing, and cloud differences.</div>
-            <div class="agent-bias">Skews toward shipped & documented — misses unbuilt concepts and the gap between docs and real UX</div>
+            <div class="agent-bias">Skews toward shipped &amp; documented — misses unbuilt concepts and the gap between docs and real UX</div>
         </div>
-        <div class="agent">
-            <div class="agent-header">
-                <div class="agent-name">Community Voice</div>
-                <div class="agent-src">forums · Reddit · Ideas Portal</div>
-            </div>
-            <div class="agent-desc">Public user sentiment, feature requests, pain points, and praise from community forums, Reddit, and the Ideas Portal.</div>
-            <div class="agent-bias">Skews toward vocal power users — underrepresents silent churners</div>
-        </div>
-        <div class="agent">
+        <!-- 2. Internal Intel -->
+        <div class="agent" data-agent="internal-intel" onclick="toggleAgent(this)">
             <div class="agent-header">
                 <div class="agent-name">Internal Intel</div>
                 <div class="agent-src">Glean · Confluence · Slack</div>
@@ -713,23 +803,54 @@
             <div class="agent-desc">PRDs, UXR archive, PM customer notes, engineering support tickets, CUJ definitions, and prior design work from internal Databricks sources.</div>
             <div class="agent-bias">Skews toward past internal thinking — may anchor to prior approaches</div>
         </div>
-        <div class="agent">
-            <div class="agent-header">
-                <div class="agent-name">Competitive</div>
-                <div class="agent-src">battlecards · CI Confluence</div>
-            </div>
-            <div class="agent-desc">How competitors approach the problem — features, positioning, win/loss patterns, and battlecard intelligence across all product areas.</div>
-            <div class="agent-bias">Skews toward Databricks-favorable framing from battlecards</div>
+        <!-- Detail: Official Docs -->
+        <div class="agent-detail" id="detail-official-docs">
+            <div class="detail-role">"What does Databricks say this feature does, how does it work, and what are its documented limitations?"</div>
+            <h4>Sources checked (in order)</h4>
+            <ul>
+                <li>Topic-specific docs from <code>intel/governance-intel.md</code> — Data Governance, AI Governance, Security, Admin Console, Cost, Performance</li>
+                <li>Release Notes — <code>docs.databricks.com/en/release-notes/</code></li>
+                <li>What's New — <code>databricks.com/product/whats-new</code></li>
+                <li>Databricks Blog — search for UX rationale and customer use cases not in docs</li>
+                <li>Data + AI Summit recordings — session videos with PM design intent</li>
+            </ul>
+            <h4>What to look for</h4>
+            <ul>
+                <li>Feature scope: what exactly is and isn't supported</li>
+                <li>Known limitations and prerequisites</li>
+                <li>UX entry points: where in the product does this live?</li>
+                <li>API surface and pricing implications</li>
+                <li>Cloud differences (AWS vs Azure vs GCP)</li>
+            </ul>
         </div>
-        <div class="agent">
-            <div class="agent-header">
-                <div class="agent-name">Quantitative</div>
-                <div class="agent-src">Logfood · SimpleBricks</div>
-            </div>
-            <div class="agent-desc">Executes actual SQL queries against Logfood — adoption metrics, funnel analysis, CUJ completion scores. Returns real numbers with reproducible queries, not hypotheticals.</div>
-            <div class="agent-bias">Can only measure what's instrumented — zero ≠ no demand</div>
+        <!-- Detail: Internal Intel -->
+        <div class="agent-detail" id="detail-internal-intel">
+            <div class="detail-role">"What does Databricks already know internally — from PRDs, field notes, prior design work, and team discussions?"</div>
+            <h4>Step 0: UXR Archive</h4>
+            <p>Check if UXR has already studied this topic before searching anywhere else.</p>
+            <table class="detail-table">
+                <tr><th>Tool</th><th>How to use</th></tr>
+                <tr><td>UXR Archive Bot</td><td><code>go/voices-rag</code> — natural language RAG over all past UXR reports</td></tr>
+                <tr><td>Research Archive</td><td><code>go/research-archive</code> — spreadsheet of every past study</td></tr>
+                <tr><td>FY2026 UX Research Tracker</td><td>Check if an active study already covers this question</td></tr>
+            </table>
+            <h4>Step 0.5: Customer Notes</h4>
+            <p>Direct PM field voice — structured call summaries via <code>go/voices-rag</code> and <code>go/voices</code> dashboard.</p>
+            <h4>Primary tool: Glean</h4>
+            <p>Run at least 3 different queries before concluding something doesn't exist internally.</p>
+            <h4>Additional sources</h4>
+            <ul>
+                <li>Confluence (UN &amp; FE spaces) — engineering specs, PM docs, design reviews</li>
+                <li>ES Tickets (<code>go/eng-ops-health</code>) — product pain by area and severity</li>
+                <li>SimpleBricks / CUJs (<code>go/making-sense-of-cujs</code>) — UX quality benchmarks</li>
+                <li>Field Engineering Listening Tours — post-sales customer friction</li>
+                <li>Professional Services Playbooks — real enterprise implementation complexity</li>
+                <li>12+ Slack channels: #user-research, #design, #unity-catalog, #customer-feedback, and more</li>
+            </ul>
         </div>
-        <div class="agent">
+
+        <!-- 3. Market Landscape -->
+        <div class="agent" data-agent="market-landscape" onclick="toggleAgent(this)">
             <div class="agent-header">
                 <div class="agent-name">Market Landscape</div>
                 <div class="agent-src">Gartner · MAD landscape</div>
@@ -737,23 +858,58 @@
             <div class="agent-desc">Broader market context, analyst views (Gartner, Forrester), vendor ecosystem, and the full ~1,200-company MAD landscape catalog.</div>
             <div class="agent-bias">Analyst views lag 6–18 months — overrepresents funded vendors</div>
         </div>
-        <div class="agent">
+        <!-- 4. Competitive -->
+        <div class="agent" data-agent="competitive" onclick="toggleAgent(this)">
             <div class="agent-header">
-                <div class="agent-name">Roadmap &amp; Planning</div>
-                <div class="agent-src">Aha! · Jira · pre-reads</div>
+                <div class="agent-name">Competitive</div>
+                <div class="agent-src">battlecards · CI Confluence</div>
             </div>
-            <div class="agent-desc">Active and planned work, quarterly commitments, and leadership priorities from pre-reads, Aha!, Jira, and OKR documents.</div>
-            <div class="agent-bias">Skews toward formally planned work — misses grassroots efforts</div>
+            <div class="agent-desc">How competitors approach the problem — features, positioning, win/loss patterns, and battlecard intelligence across all product areas.</div>
+            <div class="agent-bias">Skews toward Databricks-favorable framing from battlecards</div>
         </div>
-        <div class="agent">
-            <div class="agent-header">
-                <div class="agent-name">Foundations</div>
-                <div class="agent-src">academic · W3C · ISO</div>
-            </div>
-            <div class="agent-desc">Academic grounding, industry standards (W3C, ISO, DMBOK), canonical definitions, and conceptual frameworks from peer-reviewed sources.</div>
-            <div class="agent-bias">Skews theoretical — may over-index ideal-state vs. practical reality</div>
+        <!-- Detail: Market Landscape -->
+        <div class="agent-detail" id="detail-market-landscape">
+            <div class="detail-role">"What does the broader market look like for this topic, who are the players, and what do independent analysts say?"</div>
+            <h4>Sources checked (in order)</h4>
+            <ul>
+                <li><code>intel/landscape-intel.md</code> — full MAD catalog (~1,200 companies with Section, Stage, Tags)</li>
+                <li>Archive analyses — category trends, consolidation patterns, emerging players</li>
+                <li>External analysts: Gartner Magic Quadrant, Forrester Wave, IDC market sizing</li>
+                <li>Practitioner blogs: Benn Stancil, Locally Optimistic, Monte Carlo, Martin Fowler, TDWI</li>
+                <li>Glean — internal market research, FY26 Industry Outcome Maps</li>
+            </ul>
+            <h4>What to look for</h4>
+            <ul>
+                <li>Category definition and market size (TAM, CAGR)</li>
+                <li>Key players: leaders, challengers, niche, emerging</li>
+                <li>Buying patterns: who buys this? (data engineer, CDO, CISO)</li>
+                <li>Make vs buy dynamics and consolidation signals</li>
+                <li>Emerging threats: new entrants, OSS alternatives</li>
+            </ul>
         </div>
-        <div class="agent">
+        <!-- Detail: Competitive -->
+        <div class="agent-detail" id="detail-competitive">
+            <div class="detail-role">"What do key competitors offer, where do they differentiate, and how does Databricks' positioning hold up?"</div>
+            <h4>Sources checked (in order)</h4>
+            <ul>
+                <li>Internal battlecards — Data Governance, AI/BI, Snowflake, Fabric, BigQuery, Polaris</li>
+                <li>Competitive analyses at <code>go/compete</code> Confluence space</li>
+                <li>Win/loss data — Win/Loss Tracker, SFDC Compete360, BrickBites</li>
+                <li>CI Slack: #competition, #bigquery-compete</li>
+                <li><code>intel/landscape-intel.md</code> — broader vendor ecosystem mapping</li>
+            </ul>
+            <h4>Key competitors by topic</h4>
+            <table class="detail-table">
+                <tr><th>Topic</th><th>Primary competitors</th></tr>
+                <tr><td>Data Governance</td><td>Fabric/Purview · Snowflake Horizon · Polaris · AWS Glue · GCP Dataplex</td></tr>
+                <tr><td>Cost Governance</td><td>Snowflake · BigQuery · Azure Synapse</td></tr>
+                <tr><td>AI Governance</td><td>AWS SageMaker · Azure ML · Google Vertex AI · MLflow</td></tr>
+                <tr><td>Security</td><td>Microsoft Purview · AWS Lake Formation · Google Cloud DLP</td></tr>
+            </table>
+        </div>
+
+        <!-- 5. Sales & GTM -->
+        <div class="agent" data-agent="sales-gtm" onclick="toggleAgent(this)">
             <div class="agent-header">
                 <div class="agent-name">Sales &amp; GTM</div>
                 <div class="agent-src">BrickBites · SFDC · QBRs</div>
@@ -761,13 +917,177 @@
             <div class="agent-desc">Field signal from AE BrickBites, deal dynamics, win/loss data from SFDC Compete360, and PMM positioning frameworks.</div>
             <div class="agent-bias">"Sells well" ≠ "works well" — skews toward deal-winning narratives</div>
         </div>
-        <div class="agent">
+        <!-- 6. Community Voice -->
+        <div class="agent" data-agent="community-voice" onclick="toggleAgent(this)">
+            <div class="agent-header">
+                <div class="agent-name">Community Voice</div>
+                <div class="agent-src">forums · Reddit · Ideas Portal</div>
+            </div>
+            <div class="agent-desc">Public user sentiment, feature requests, pain points, and praise from community forums, Reddit, and the Ideas Portal.</div>
+            <div class="agent-bias">Skews toward vocal power users — underrepresents silent churners</div>
+        </div>
+        <!-- Detail: Sales & GTM -->
+        <div class="agent-detail" id="detail-sales-gtm">
+            <div class="detail-role">"How is this topic playing out in actual sales conversations, deal cycles, and field positioning?"</div>
+            <h4>Sources checked (in order)</h4>
+            <ul>
+                <li>Win/Loss data — Win/Loss Tracker, SFDC Compete360 (deal-level), BrickBites (AE videos), Win Wires</li>
+                <li>GTM strategy — messaging frameworks, launch briefs, NPI, TKO product positioning</li>
+                <li>Sales tools — Sales Portal, playbooks, SA Handbook, GTM Account Research agent</li>
+                <li>Account analytics — <code>go/hub</code>, <code>go/customerinsights</code>, GTM Silver Logfood tables</li>
+                <li>Field Engineering signal — listening tours, FE intranet</li>
+                <li>Slack: #field-insights, #market-info, #competition, #product-launches</li>
+            </ul>
+            <h4>What to look for</h4>
+            <ul>
+                <li>Win/loss reasons and objection patterns</li>
+                <li>Messaging-reality gap: does PMM positioning match field reality?</li>
+                <li>Segment patterns (enterprise vs mid-market, cloud-specific)</li>
+                <li>Account expansion signal and competitive displacement triggers</li>
+            </ul>
+        </div>
+        <!-- Detail: Community Voice -->
+        <div class="agent-detail" id="detail-community-voice">
+            <div class="detail-role">"What do practitioners and customers think about this topic, and what do they want changed or built?"</div>
+            <h4>Sources checked (ranked — top to bottom)</h4>
+            <ul>
+                <li>Databricks Ideas Portal — vote counts as quantitative signal</li>
+                <li>Databricks Community Forum — threads with many replies = widespread problem</li>
+                <li>Unity Catalog GitHub Issues — label patterns reveal pain clusters</li>
+                <li>r/databricks and r/dataengineering — candid practitioner opinions</li>
+                <li>Stack Overflow (databricks tag) — high-vote questions = common stumbling blocks</li>
+                <li>r/analyticsengineers — governance in analytics context</li>
+            </ul>
+            <h4>What to look for</h4>
+            <ul>
+                <li>Top pain points with frequency signal</li>
+                <li>Workarounds in use (signals a missing feature)</li>
+                <li>Feature requests with high vote counts</li>
+                <li>Competitor comparisons ("Snowflake does this better because...")</li>
+                <li>Onboarding friction and power user vs novice conflicts</li>
+            </ul>
+        </div>
+
+        <!-- 7. Roadmap & Planning -->
+        <div class="agent" data-agent="roadmap" onclick="toggleAgent(this)">
+            <div class="agent-header">
+                <div class="agent-name">Roadmap &amp; Planning</div>
+                <div class="agent-src">Aha! · Jira · pre-reads</div>
+            </div>
+            <div class="agent-desc">Active and planned work, quarterly commitments, and leadership priorities from pre-reads, Aha!, Jira, and OKR documents.</div>
+            <div class="agent-bias">Skews toward formally planned work — misses grassroots efforts</div>
+        </div>
+        <!-- 8. Quantitative -->
+        <div class="agent" data-agent="quantitative" onclick="toggleAgent(this)">
+            <div class="agent-header">
+                <div class="agent-name">Quantitative</div>
+                <div class="agent-src">Logfood · SimpleBricks</div>
+            </div>
+            <div class="agent-desc">Executes actual SQL queries against Logfood — adoption metrics, funnel analysis, CUJ completion scores. Returns real numbers with reproducible queries, not hypotheticals.</div>
+            <div class="agent-bias">Can only measure what's instrumented — zero ≠ no demand</div>
+        </div>
+        <!-- Detail: Roadmap -->
+        <div class="agent-detail" id="detail-roadmap">
+            <div class="detail-role">"Is there active or planned work on this topic, and what is the stated priority, timeline, and team ownership?"</div>
+            <h4>Sources checked (in order)</h4>
+            <ul>
+                <li>Team pre-reads (<code>go/roadmapdocs</code>) — quarterly snapshot: objectives, NPS, ES counts, SimpleBricks, feature requests</li>
+                <li>Aha! (<code>go/aha-pm</code>) — official product roadmap with customer votes, Jira links, release targets</li>
+                <li>Company priorities — <code>go/cko</code>, <code>go/tko-decks</code>, FY27 strategic priorities</li>
+                <li>Jira — active epics and sprints via Glean or Jira MCP</li>
+                <li>GTM launch plans — launch briefs, NPI checklists</li>
+                <li>Slack: #product-launches, #tko-fy27</li>
+            </ul>
+            <h4>What to look for</h4>
+            <ul>
+                <li>Active Jira epic or Aha! feature in progress</li>
+                <li>Leadership priority tier (Tier 1 company vs team-level vs unmentioned)</li>
+                <li>Timeline signal and team ownership</li>
+                <li>De-prioritization signal — was this on a past pre-read but dropped?</li>
+                <li>Cross-team overlap — multiple teams on adjacent problems?</li>
+            </ul>
+        </div>
+        <!-- Detail: Quantitative -->
+        <div class="agent-detail" id="detail-quantitative">
+            <div class="detail-role">"What does the data say about how this feature is actually being used, by whom, and at what scale?"</div>
+            <h4>Workspace</h4>
+            <p><code>central-logfood-prodtools-azure-westus</code> — all queries via <code>mcp__databricks-v2__execute_parameterized_sql</code></p>
+            <h4>Key tables</h4>
+            <table class="detail-table">
+                <tr><th>Topic</th><th>Tables</th></tr>
+                <tr><td>UC Adoption</td><td><code>workspace_metrics</code>, <code>unity_catalog_customer_metric_daily</code>, <code>workspace_data_governance_metrics_agg</code></td></tr>
+                <tr><td>UI &amp; Funnel</td><td><code>agg_traces_30d</code>, <code>adhoc_funnel_sankey_metrics</code>, <code>user_metrics</code></td></tr>
+                <tr><td>SimpleBricks</td><td><code>okr_fy26_report_metric_snapshot_latest_post_processed</code></td></tr>
+                <tr><td>GTM / Accounts</td><td><code>fct_customer_insights_dbr_type_weekly</code>, <code>account_platform_consumption_daily</code></td></tr>
+            </table>
+            <h4>Mandatory execution protocol</h4>
+            <ul>
+                <li>Connect → DESCRIBE → LIMIT 10 → progressively broader queries</li>
+                <li>Every finding must include the exact SQL, actual numbers, time period, and caveats</li>
+                <li>If queries fail: report data from authoritative docs with clear caveat</li>
+            </ul>
+        </div>
+
+        <!-- 9. Foundations -->
+        <div class="agent" data-agent="foundations" onclick="toggleAgent(this)">
+            <div class="agent-header">
+                <div class="agent-name">Foundations</div>
+                <div class="agent-src">academic · W3C · ISO</div>
+            </div>
+            <div class="agent-desc">Academic grounding, industry standards (W3C, ISO, DMBOK), canonical definitions, and conceptual frameworks from peer-reviewed sources.</div>
+            <div class="agent-bias">Skews theoretical — may over-index ideal-state vs. practical reality</div>
+        </div>
+        <!-- 10. Product Design -->
+        <div class="agent" data-agent="product-design" onclick="toggleAgent(this)">
             <div class="agent-header">
                 <div class="agent-name">Product Design</div>
                 <div class="agent-src">NNGroup · design systems · competitor UX</div>
             </div>
             <div class="agent-desc">UX patterns, competitor UI analysis, and design implications. Runs twice — as a researcher in Phase 2, then synthesizes all findings into a consolidated design implications section with an "Explore these ideas" prompt.</div>
             <div class="agent-bias">May underweight engineering feasibility and business constraints</div>
+        </div>
+        <!-- Detail: Foundations -->
+        <div class="agent-detail" id="detail-foundations">
+            <div class="detail-role">"What does the broader world know about this concept — its origins, definitions, standards, and how practitioners outside Databricks think about it?"</div>
+            <h4>Sources checked (in order)</h4>
+            <ul>
+                <li>Standards: W3C (RDF, OWL, SPARQL, DCAT), ISO (8000, 27001), DMBOK, Schema.org, OpenLineage, OpenMetadata</li>
+                <li>Academic: Google Scholar, Semantic Scholar, ACM (SIGMOD, VLDB, CHI), arXiv, IEEE</li>
+                <li>Thought leaders: Martin Fowler, Zhamak Dehghani, Joe Reis, Atlan Blog, dbt Blog, Monte Carlo</li>
+                <li>Books: DMBOK 2, Data Mesh (Dehghani), Knowledge Graphs (Hogan), Information Architecture (Rosenfeld)</li>
+                <li>Conferences: Data + AI Summit, Strata, KDD, Knowledge Graph Conference, dbt Coalesce</li>
+            </ul>
+            <h4>Search strategy</h4>
+            <ul>
+                <li>Define before you explore — establish a working definition first</li>
+                <li>Map the intellectual lineage — who coined this? What does it build on?</li>
+                <li>Identify the specification layer — formal standards to be aware of</li>
+                <li>Bridge to practice — how real companies actually implement this</li>
+                <li>Check OSS implementations — GitHub stars and data models for inspiration</li>
+            </ul>
+        </div>
+        <!-- Detail: Product Design -->
+        <div class="agent-detail" id="detail-product-design">
+            <div class="detail-role">"What are the product design implications — and what design patterns, UX benchmarks, and interaction models should inform our approach?"</div>
+            <h4>Job 1: Design Research (parallel)</h4>
+            <table class="detail-table">
+                <tr><th>Source type</th><th>Examples</th></tr>
+                <tr><td>Competitor UX</td><td>Snowflake Horizon, Fabric/Purview, Atlan, Alation, Collibra, dbt Cloud, Monte Carlo, Immuta, Secoda</td></tr>
+                <tr><td>Design systems</td><td>NNGroup, Baymard, Material Design, Carbon (IBM), Ant Design, Primer (GitHub), Atlassian, Apple HIG</td></tr>
+                <tr><td>Design strategy</td><td>Intercom, Julie Zhuo, Lenny's Newsletter, Spotify Design, Figma Blog, UX Collective</td></tr>
+                <tr><td>Internal</td><td>Databricks DS, prior design explorations, UXR Archive, SimpleBricks/CUJ docs, Figma files</td></tr>
+                <tr><td>Academic HCI</td><td>ACM CHI, IEEE VIS, Tamara Munzner</td></tr>
+            </table>
+            <h4>Job 2: Design Synthesis (after all agents)</h4>
+            <p>Reads all other agents' findings and produces: user mental model, key interaction patterns, IA considerations, UX risks, design questions, recommended next steps, and "Explore these ideas" prompt for generating mockups.</p>
+            <h4>Synthesis principles</h4>
+            <ul>
+                <li>Connect findings to user tasks, not features</li>
+                <li>Name the tensions between conflicting signals</li>
+                <li>Reference specific patterns (e.g., "progressive disclosure per NNGroup")</li>
+                <li>Flag where user research is needed to resolve design questions</li>
+                <li>Prioritize by impact — highest-risk design decisions first</li>
+            </ul>
         </div>
     </div>
 </section>
@@ -987,6 +1307,22 @@ cp -r skill/ ~/.cursor/docs/research/</pre>
 </footer>
 
 <script>
+    function toggleAgent(el) {
+        const id = 'detail-' + el.dataset.agent;
+        const panel = document.getElementById(id);
+        const wasVisible = panel.classList.contains('visible');
+
+        // Close all panels first
+        document.querySelectorAll('.agent-detail').forEach(d => d.classList.remove('visible'));
+        document.querySelectorAll('.agent').forEach(a => a.classList.remove('expanded'));
+
+        // Toggle the clicked one
+        if (!wasVisible) {
+            panel.classList.add('visible');
+            el.classList.add('expanded');
+        }
+    }
+
     function copyCode(id, btn) {
         const el = document.getElementById(id);
         // Get plain text, stripping leading/trailing whitespace
