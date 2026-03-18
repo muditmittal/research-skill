@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Skill — Databricks</title>
+    <style>
+        :root {
+            --bg:            #07070e;
+            --bg-subtle:     #0d0d1a;
+            --card:          #0f0f1c;
+            --card-hover:    #151528;
+            --accent:        #ff6b35;
+            --accent-glow:   rgba(255, 107, 53, 0.07);
+            --accent-dim:    rgba(255, 107, 53, 0.12);
+            --accent-border: rgba(255, 107, 53, 0.28);
+            --text:          #ddddf0;
+            --text-muted:    #7a7a96;
+            --text-dim:      #3d3d52;
+            --border:        #191926;
+            --border-bright: #232338;
+            --code-bg:       #09090f;
+            --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 15px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ─── Nav ─────────────────────────────────────────── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2.5rem;
+            background: rgba(7, 7, 14, 0.82);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+            color: var(--text);
+        }
+        .nav-logo span { color: var(--accent); }
+
+        .nav-links {
+            display: flex;
+            gap: 1.8rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.83rem;
+            transition: color 0.18s;
+        }
+        .nav-links a:hover { color: var(--text); }
+
+        /* ─── Layout ──────────────────────────────────────── */
+        .container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 2.5rem;
+        }
+
+        section { padding: 5.5rem 0; }
+        section + section { border-top: 1px solid var(--border); }
+
+        .section-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            margin-bottom: 0.55rem;
+        }
+
+        h2 {
+            font-size: clamp(1.7rem, 3vw, 2.3rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-desc {
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            max-width: 500px;
+            line-height: 1.75;
+            margin-bottom: 2.8rem;
+        }
+
+        /* ─── Spinning seal ──────────────────────────────── */
+        .seal-wrap {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2.2rem;
+        }
+
+        .seal {
+            width: 160px;
+            height: 160px;
+            position: relative;
+        }
+
+        .seal-spin {
+            animation: spin 18s linear infinite;
+            width: 100%;
+            height: 100%;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+        }
+
+        .seal-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 58px;
+            height: 58px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .seal-center-icon {
+            font-size: 1.3rem;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            font-family: var(--mono);
+        }
+
+        /* ─── Hero ────────────────────────────────────────── */
+        .hero {
+            padding: 8rem 0 5.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(ellipse at center, rgba(255, 107, 53, 0.06) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent-border);
+            border-radius: 100px;
+            padding: 0.28rem 0.85rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1.8rem;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.6rem, 5.5vw, 4rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            color: #fff;
+            margin-bottom: 1.3rem;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(125deg, #ff6b35 20%, #ff9c6c 80%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            max-width: 540px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.75;
+        }
+
+        .ctas {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.18s;
+            font-family: inherit;
+        }
+        .btn-primary { background: var(--accent); color: #fff; }
+        .btn-primary:hover { background: #ff7d4d; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255, 107, 53, 0.3); }
+        .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border-bright); }
+        .btn-secondary:hover { border-color: var(--accent-border); color: var(--accent); }
+
+        /* Stats strip */
+        .stats {
+            display: flex;
+            justify-content: center;
+            border: 1px solid var(--border-bright);
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 660px;
+            margin: 0 auto;
+            background: var(--card);
+        }
+        .stat {
+            flex: 1;
+            padding: 1.2rem 0.8rem;
+            text-align: center;
+            border-right: 1px solid var(--border);
+        }
+        .stat:last-child { border-right: none; }
+        .stat-n {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.02em;
+        }
+        .stat-l {
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ─── Phase grid ──────────────────────────────────── */
+        .phases {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border-bright);
+            border: 1px solid var(--border-bright);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .phase {
+            background: var(--card);
+            padding: 2rem 1.6rem;
+            transition: background 0.18s;
+        }
+        .phase:hover { background: var(--card-hover); }
+
+        .phase-num {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--accent-dim);
+            line-height: 1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.04em;
+        }
+
+        .phase-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.45rem;
+        }
+
+        .phase-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+
+        .tag {
+            display: inline-block;
+            margin-top: 1.1rem;
+            font-size: 0.68rem;
+            font-family: var(--mono);
+            padding: 0.18rem 0.5rem;
+            border-radius: 4px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border: 1px solid var(--accent-border);
+        }
+
+        /* ─── Agent grid ──────────────────────────────────── */
+        .agents {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1px;
+            background: var(--border-bright);
+            border: 1px solid var(--border-bright);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .agent {
+            background: var(--card);
+            padding: 1.5rem 1.6rem;
+            transition: background 0.18s;
+        }
+        .agent:hover { background: var(--card-hover); }
+
+        .agent-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 0.45rem;
+        }
+
+        .agent-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .agent-src {
+            font-size: 0.68rem;
+            color: var(--text-dim);
+            white-space: nowrap;
+            padding-top: 0.15rem;
+            font-family: var(--mono);
+        }
+
+        .agent-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .agent-bias {
+            font-size: 0.71rem;
+            color: var(--text-dim);
+            font-style: italic;
+            border-left: 2px solid var(--border-bright);
+            padding-left: 0.55rem;
+        }
+
+        /* ─── Diff cards ──────────────────────────────────── */
+        .diffs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .diff {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: border-color 0.18s, background 0.18s;
+        }
+        .diff:hover { border-color: var(--accent-border); background: var(--card-hover); }
+
+        .diff-icon { font-size: 1.5rem; margin-bottom: 0.75rem; display: block; }
+        .diff-title { font-size: 0.88rem; font-weight: 600; color: #fff; margin-bottom: 0.4rem; }
+        .diff-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.65; }
+
+        /* ─── Trust hierarchy ─────────────────────────────── */
+        .trust {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border: 1px solid var(--border-bright);
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 680px;
+        }
+
+        .trust-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 1.2rem;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+        .trust-row:last-child { border-bottom: none; }
+        .trust-row:hover { background: var(--card-hover); }
+
+        .trust-rank {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+            font-size: 0.68rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .trust-source { font-size: 0.82rem; font-weight: 500; color: var(--text); flex: 1; }
+        .trust-why { font-size: 0.72rem; color: var(--text-muted); text-align: right; }
+
+        /* ─── Install steps ───────────────────────────────── */
+        .steps { display: flex; flex-direction: column; gap: 2rem; }
+
+        .step {
+            display: grid;
+            grid-template-columns: 48px 1fr;
+            gap: 1.3rem;
+            align-items: start;
+        }
+
+        .step-num {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent-border);
+            color: var(--accent);
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .step h3 { font-size: 0.92rem; font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+        .step p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 0.65rem; }
+
+        .code-wrap { position: relative; }
+
+        pre.code-block {
+            display: block;
+            background: var(--code-bg);
+            border: 1px solid var(--border-bright);
+            border-radius: 8px;
+            padding: 0.9rem 1.1rem;
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: #c5cae9;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: var(--border-bright);
+            border: 1px solid var(--border-bright);
+            border-radius: 5px;
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            padding: 0.22rem 0.55rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+        }
+        .copy-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+        .copy-btn.copied { background: #22c55e; border-color: #22c55e; color: #fff; }
+
+        .cc { color: #3d3d58; }   /* comment */
+        .ck { color: var(--accent); }  /* keyword / slash command */
+        .cp { color: #82b1ff; }   /* path / arg */
+        .cs { color: #80cbc4; }   /* string */
+
+        /* ─── Prerequisites ───────────────────────────────── */
+        .prereqs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .prereq {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.1rem 1.3rem;
+            transition: border-color 0.18s;
+        }
+        .prereq:hover { border-color: var(--accent-border); }
+
+        .prereq-name { font-size: 0.85rem; font-weight: 600; color: #fff; margin-bottom: 0.25rem; }
+        .prereq-use { font-size: 0.73rem; color: var(--text-muted); line-height: 1.5; }
+        .prereq-use code { font-family: var(--mono); font-size: 0.68rem; color: #82b1ff; }
+
+        /* ─── Customize ───────────────────────────────────── */
+        .customize-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cust-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.4rem;
+            transition: border-color 0.18s;
+        }
+        .cust-card:hover { border-color: var(--accent-border); }
+
+        .cust-badge {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .cust-file {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: #82b1ff;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .cust-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+        .note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        .note code { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); }
+
+        /* ─── Footer ──────────────────────────────────────── */
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            text-align: center;
+        }
+        footer p { font-size: 0.78rem; color: var(--text-dim); }
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* ─── Responsive ──────────────────────────────────── */
+        @media (max-width: 820px) {
+            .phases          { grid-template-columns: repeat(2, 1fr); }
+            .agents          { grid-template-columns: 1fr; }
+            .diffs           { grid-template-columns: repeat(2, 1fr); }
+            .prereqs         { grid-template-columns: repeat(2, 1fr); }
+            .customize-cards { grid-template-columns: 1fr; }
+            .nav-links       { display: none; }
+        }
+        @media (max-width: 520px) {
+            .diffs  { grid-template-columns: 1fr; }
+            .prereqs { grid-template-columns: 1fr; }
+            .stats  { flex-wrap: wrap; }
+            .stat   { min-width: 33%; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Nav ───────────────────────────────────────────────────────── -->
+<nav>
+    <div class="nav-logo">Research Skill <span>for Databricks</span></div>
+    <ul class="nav-links">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#agents">Agents</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#customize">Customize</a></li>
+    </ul>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────────── -->
+<div class="container">
+<section class="hero">
+    <div class="seal-wrap">
+        <div class="seal">
+            <svg class="seal-spin" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <path id="seal-text-path" d="M 100, 100 m -78, 0 a 78,78 0 1,1 156,0 a 78,78 0 1,1 -156,0" fill="none"/>
+                </defs>
+                <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" font-size="14.2" font-weight="900" letter-spacing="5.8" fill="#ff6b35" text-transform="uppercase">
+                    <textPath href="#seal-text-path" startOffset="0%">DATABRICKS DESIGN RESEARCH</textPath>
+                </text>
+                <circle cx="100" cy="100" r="68" fill="none" stroke="rgba(255,107,53,0.18)" stroke-width="1"/>
+                <circle cx="100" cy="100" r="88" fill="none" stroke="rgba(255,107,53,0.10)" stroke-width="1"/>
+            </svg>
+            <div class="seal-center">
+                <div class="seal-center-icon">DR</div>
+            </div>
+        </div>
+    </div>
+    <div class="eyebrow">Multi-Agent Research System</div>
+    <h1>Ten agents.<br><em>One synthesized answer.</em></h1>
+    <p class="hero-sub">Ask a product question. Up to 10 specialized agents search in parallel — each covering a different dimension of knowledge — then synthesize into a polished Google Doc with conflicts resolved and design implications included.</p>
+    <div class="ctas">
+        <a href="#install" class="btn btn-primary">Install the skill ↓</a>
+        <a href="#how-it-works" class="btn btn-secondary">How it works</a>
+    </div>
+    <div class="stats">
+        <div class="stat"><div class="stat-n">10</div><div class="stat-l">Agents</div></div>
+        <div class="stat"><div class="stat-n">7</div><div class="stat-l">Intel Modules</div></div>
+        <div class="stat"><div class="stat-n">20</div><div class="stat-l">Dispatch Patterns</div></div>
+        <div class="stat"><div class="stat-n">9</div><div class="stat-l">Trust Levels</div></div>
+        <div class="stat"><div class="stat-n">4</div><div class="stat-l">Phases</div></div>
+    </div>
+</section>
+</div>
+
+<!-- ── How it works ──────────────────────────────────────────────── -->
+<div class="container">
+<section id="how-it-works">
+    <div class="section-label">How it works</div>
+    <h2>From question to Google Doc<br>in four phases</h2>
+    <p class="section-desc">Type <code style="font-family:var(--mono);background:var(--accent-dim);color:var(--accent);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.82rem">/research &lt;your question&gt;</code> and the system handles the rest.</p>
+    <div class="phases">
+        <div class="phase">
+            <div class="phase-num">01</div>
+            <div class="phase-title">Dispatch</div>
+            <div class="phase-desc">The question is matched against 20 dispatch patterns. The right subset of agents is selected and spawned in parallel.</div>
+            <div class="tag">INDEX.md</div>
+        </div>
+        <div class="phase">
+            <div class="phase-num">02</div>
+            <div class="phase-title">Collect</div>
+            <div class="phase-desc">Each agent searches its domain and returns findings in a standardized format — key findings, evidence table, gaps, and a coverage confidence rating.</div>
+            <div class="tag">agents/</div>
+        </div>
+        <div class="phase">
+            <div class="phase-num">03</div>
+            <div class="phase-title">Synthesize</div>
+            <div class="phase-desc">Coverage confidence check, conflicts resolved via 9-level trust hierarchy, citations renumbered into a unified reference list. Product Design agent synthesizes all findings into a consolidated design implications section.</div>
+            <div class="tag">INDEX.md</div>
+        </div>
+        <div class="phase">
+            <div class="phase-num">04</div>
+            <div class="phase-title">Publish</div>
+            <div class="phase-desc">Findings-first Google Doc — executive summary, themes, design implications, references, appendix. Follow-ups update the same doc in place; URL never changes.</div>
+            <div class="tag">Google Docs MCP</div>
+        </div>
+    </div>
+</section>
+</div>
+
+<!-- ── Agents ─────────────────────────────────────────────────────── -->
+<div class="container">
+<section id="agents">
+    <div class="section-label">The agents</div>
+    <h2>Ten lenses on every question</h2>
+    <p class="section-desc">Each agent declares its bias upfront. The synthesis judge knows where to discount and cross-reference.</p>
+    <div class="agents">
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Official Docs</div>
+                <div class="agent-src">docs.databricks.com</div>
+            </div>
+            <div class="agent-desc">What Databricks has shipped, documented, and publicly committed to. Covers feature scope, known limitations, API surface, pricing, and cloud differences.</div>
+            <div class="agent-bias">Skews toward shipped & documented — misses unbuilt concepts and the gap between docs and real UX</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Community Voice</div>
+                <div class="agent-src">forums · Reddit · Ideas Portal</div>
+            </div>
+            <div class="agent-desc">Public user sentiment, feature requests, pain points, and praise from community forums, Reddit, and the Ideas Portal.</div>
+            <div class="agent-bias">Skews toward vocal power users — underrepresents silent churners</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Internal Intel</div>
+                <div class="agent-src">Glean · Confluence · Slack</div>
+            </div>
+            <div class="agent-desc">PRDs, UXR archive, PM customer notes, engineering support tickets, CUJ definitions, and prior design work from internal Databricks sources.</div>
+            <div class="agent-bias">Skews toward past internal thinking — may anchor to prior approaches</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Competitive</div>
+                <div class="agent-src">battlecards · CI Confluence</div>
+            </div>
+            <div class="agent-desc">How competitors approach the problem — features, positioning, win/loss patterns, and battlecard intelligence across all product areas.</div>
+            <div class="agent-bias">Skews toward Databricks-favorable framing from battlecards</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Quantitative</div>
+                <div class="agent-src">Logfood · SimpleBricks</div>
+            </div>
+            <div class="agent-desc">Executes actual SQL queries against Logfood — adoption metrics, funnel analysis, CUJ completion scores. Returns real numbers with reproducible queries, not hypotheticals.</div>
+            <div class="agent-bias">Can only measure what's instrumented — zero ≠ no demand</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Market Landscape</div>
+                <div class="agent-src">Gartner · MAD landscape</div>
+            </div>
+            <div class="agent-desc">Broader market context, analyst views (Gartner, Forrester), vendor ecosystem, and the full ~1,200-company MAD landscape catalog.</div>
+            <div class="agent-bias">Analyst views lag 6–18 months — overrepresents funded vendors</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Roadmap &amp; Planning</div>
+                <div class="agent-src">Aha! · Jira · pre-reads</div>
+            </div>
+            <div class="agent-desc">Active and planned work, quarterly commitments, and leadership priorities from pre-reads, Aha!, Jira, and OKR documents.</div>
+            <div class="agent-bias">Skews toward formally planned work — misses grassroots efforts</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Foundations</div>
+                <div class="agent-src">academic · W3C · ISO</div>
+            </div>
+            <div class="agent-desc">Academic grounding, industry standards (W3C, ISO, DMBOK), canonical definitions, and conceptual frameworks from peer-reviewed sources.</div>
+            <div class="agent-bias">Skews theoretical — may over-index ideal-state vs. practical reality</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Sales &amp; GTM</div>
+                <div class="agent-src">BrickBites · SFDC · QBRs</div>
+            </div>
+            <div class="agent-desc">Field signal from AE BrickBites, deal dynamics, win/loss data from SFDC Compete360, and PMM positioning frameworks.</div>
+            <div class="agent-bias">"Sells well" ≠ "works well" — skews toward deal-winning narratives</div>
+        </div>
+        <div class="agent">
+            <div class="agent-header">
+                <div class="agent-name">Product Design</div>
+                <div class="agent-src">NNGroup · design systems · competitor UX</div>
+            </div>
+            <div class="agent-desc">UX patterns, competitor UI analysis, and design implications. Runs twice — as a researcher in Phase 2, then synthesizes all findings into a consolidated design implications section with an "Explore these ideas" prompt.</div>
+            <div class="agent-bias">May underweight engineering feasibility and business constraints</div>
+        </div>
+    </div>
+</section>
+</div>
+
+<!-- ── Differentiators ────────────────────────────────────────────── -->
+<div class="container">
+<section>
+    <div class="section-label">Why it's different</div>
+    <h2>Built for signal quality,<br>not just coverage</h2>
+    <p class="section-desc">Most research is a pile of links. This system is designed for synthesis.</p>
+    <div class="diffs">
+        <div class="diff">
+            <span class="diff-icon">📊</span>
+            <div class="diff-title">Coverage Confidence</div>
+            <div class="diff-desc">Before synthesizing, the system checks how many agents returned substantive findings. Under-researched topics are flagged — not presented as conclusive.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">⚖️</span>
+            <div class="diff-title">9-Level Trust Hierarchy</div>
+            <div class="diff-desc">When agents conflict, a ranked authority chain resolves it mechanically. Logfood data beats battlecards. Customer notes beat analyst reports. Declared upfront, applied consistently.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">🔗</span>
+            <div class="diff-title">Inline Citations</div>
+            <div class="diff-desc">Every factual claim has a [N] reference linking to the source. Citations are renumbered into a unified reference list during synthesis — grouped by internal data, internal docs, and external sources.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">🎨</span>
+            <div class="diff-title">Design Implications</div>
+            <div class="diff-desc">Every output ends with a consolidated design section: user mental model, interaction patterns, IA considerations, UX risks, and an "Explore these ideas" prompt for generating mockups.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">🔄</span>
+            <div class="diff-title">Follow-Up Preservation</div>
+            <div class="diff-desc">Follow-up research surgically updates the existing Google Doc — only changed sections are modified. The URL never changes. No more broken links in Slack or Confluence.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">📄</span>
+            <div class="diff-title">Findings-First Output</div>
+            <div class="diff-desc">Executive summary, themes, conflicts, design implications up front. Research methodology and raw agent outputs in the appendix — because stakeholders care about findings, not process.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">🔢</span>
+            <div class="diff-title">Real Quantitative Data</div>
+            <div class="diff-desc">The Quantitative agent executes actual SQL against Logfood and returns real numbers — not hypothetical queries. Every data point includes the query, time period, and caveats.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">🏷️</span>
+            <div class="diff-title">Shared Tag Taxonomy</div>
+            <div class="diff-desc">All agents tag findings across 5 dimensions: source type, business function, signal quality, topic domain, and access level. Conflict resolution becomes mechanical.</div>
+        </div>
+        <div class="diff">
+            <span class="diff-icon">🔧</span>
+            <div class="diff-title">Any Product Area</div>
+            <div class="diff-desc">Ships with Data Governance defaults. Swap three files for AI/BI, Pipelines, Compute, GenAI, or any other area. The dispatch and synthesis system is topic-agnostic.</div>
+        </div>
+    </div>
+</section>
+</div>
+
+<!-- ── Trust hierarchy ───────────────────────────────────────────── -->
+<div class="container">
+<section>
+    <div class="section-label">Conflict resolution</div>
+    <h2>The trust hierarchy</h2>
+    <p class="section-desc">When two agents report conflicting information, the higher-ranked source wins. No judgment calls — it's declared and applied mechanically.</p>
+    <div class="trust">
+        <div class="trust-row"><div class="trust-rank">1</div><div class="trust-source">Logfood quantitative data</div><div class="trust-why">Actual observed behavior</div></div>
+        <div class="trust-row"><div class="trust-rank">2</div><div class="trust-source">Internal PRDs &amp; strategy docs</div><div class="trust-why">Intent &amp; internal decisions</div></div>
+        <div class="trust-row"><div class="trust-rank">3</div><div class="trust-source">Official Databricks docs</div><div class="trust-why">Publicly committed</div></div>
+        <div class="trust-row"><div class="trust-rank">4</div><div class="trust-source">Customer notes · Win/loss data (SFDC)</div><div class="trust-why">Direct customer signal</div></div>
+        <div class="trust-row"><div class="trust-rank">5</div><div class="trust-source">Industry standards · Sales field signal</div><div class="trust-why">Established definitions + field patterns</div></div>
+        <div class="trust-row"><div class="trust-rank">6</div><div class="trust-source">Community &amp; Ideas Portal</div><div class="trust-why">Broader public signal</div></div>
+        <div class="trust-row"><div class="trust-rank">7</div><div class="trust-source">Competitive battlecards</div><div class="trust-why">Databricks-framed — useful, not neutral</div></div>
+        <div class="trust-row"><div class="trust-rank">8</div><div class="trust-source">External analysts (Gartner, Forrester)</div><div class="trust-why">Independent but lagging 6–18 months</div></div>
+        <div class="trust-row"><div class="trust-rank">9</div><div class="trust-source">External blogs &amp; practitioners</div><div class="trust-why">Opinion-based; useful for trends</div></div>
+    </div>
+</section>
+</div>
+
+<!-- ── Install ────────────────────────────────────────────────────── -->
+<div class="container">
+<section id="install">
+    <div class="section-label">Get started</div>
+    <h2>Install in five steps</h2>
+    <p class="section-desc">Requires Claude Code with MCP servers configured. See prerequisites below.</p>
+    <div class="steps">
+
+        <div class="step">
+            <div class="step-num">1</div>
+            <div>
+                <h3>Copy the skill to Claude Code</h3>
+                <p>Copy the <code style="font-family:var(--mono);color:var(--accent);font-size:0.77rem">skill/</code> folder into Claude Code's docs directory so it can be loaded at research time.</p>
+                <div class="code-wrap">
+                    <pre class="code-block" id="c1"><span class="cc"># Run from the repo root</span>
+cp -r skill/ ~/.cursor/docs/research/</pre>
+                    <button class="copy-btn" onclick="copyCode('c1',this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">2</div>
+            <div>
+                <h3>Read INDEX.md before first use</h3>
+                <p>The entry point is <code style="font-family:var(--mono);color:var(--accent);font-size:0.77rem">INDEX.md</code>. Skim the dispatch table and synthesis rubric so you know what to expect from each research run.</p>
+                <div class="code-wrap">
+                    <pre class="code-block" id="c2">cat ~/.cursor/docs/research/INDEX.md</pre>
+                    <button class="copy-btn" onclick="copyCode('c2',this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">3</div>
+            <div>
+                <h3>Customize for your product area</h3>
+                <p>The skill ships with Data Governance defaults. If you work on AI/BI, Pipelines, Compute, or another area, follow the 5 steps in <code style="font-family:var(--mono);color:var(--accent);font-size:0.77rem">CUSTOMIZE.md</code> before running research.</p>
+                <div class="code-wrap">
+                    <pre class="code-block" id="c3">cat ~/.cursor/docs/research/CUSTOMIZE.md</pre>
+                    <button class="copy-btn" onclick="copyCode('c3',this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">4</div>
+            <div>
+                <h3>Verify your MCP connections</h3>
+                <p>Check that Google Docs, Glean, Databricks (Logfood), Slack, and Jira MCPs are active in Claude Code. If any are missing, the corresponding agent will note a gap — the run won't break, but coverage will be lower. See prerequisites below for access details.</p>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-num">5</div>
+            <div>
+                <h3>Run your first research</h3>
+                <div class="code-wrap">
+                    <pre class="code-block" id="c5"><span class="ck">/research</span> <span class="cs">Should we build an Ontology feature inside Databricks?</span></pre>
+                    <button class="copy-btn" onclick="copyCode('c5',this)">Copy</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+</div>
+
+<!-- ── Prerequisites ─────────────────────────────────────────────── -->
+<div class="container">
+<section id="prerequisites">
+    <div class="section-label">Prerequisites</div>
+    <h2>What you need</h2>
+    <p class="section-desc">Requires Claude Code with these MCP servers configured. Missing access causes the corresponding agent to note a gap — it won't break the run.</p>
+    <div class="prereqs">
+        <div class="prereq">
+            <div class="prereq-name">Google Docs MCP</div>
+            <div class="prereq-use">Phase 4 — final output publishing. Without it, output stays in terminal.</div>
+        </div>
+        <div class="prereq">
+            <div class="prereq-name">Glean MCP</div>
+            <div class="prereq-use">Internal Intel, Roadmap, Sales &amp; GTM agents.<br><code>go/glean</code></div>
+        </div>
+        <div class="prereq">
+            <div class="prereq-name">Databricks MCP</div>
+            <div class="prereq-use">Quantitative agent — Logfood SQL queries.<br><code>central-logfood-prodtools-azure-westus</code></div>
+        </div>
+        <div class="prereq">
+            <div class="prereq-name">Confluence</div>
+            <div class="prereq-use">Internal Intel, Roadmap agents. Needs access to the UN and FE spaces.</div>
+        </div>
+        <div class="prereq">
+            <div class="prereq-name">Slack</div>
+            <div class="prereq-use">Supplemental signal for the Internal Intel agent. Optional but improves recency.</div>
+        </div>
+        <div class="prereq">
+            <div class="prereq-name">Jira</div>
+            <div class="prereq-use">Roadmap &amp; Planning agent — ticket-level planning context and sprint data.</div>
+        </div>
+    </div>
+</section>
+</div>
+
+<!-- ── Customize ─────────────────────────────────────────────────── -->
+<div class="container">
+<section id="customize">
+    <div class="section-label">Customization</div>
+    <h2>Works for any product area</h2>
+    <p class="section-desc">Ships with Data Governance / Unity Catalog defaults. Three files need replacing for other teams — everything else works as-is.</p>
+    <div class="customize-cards">
+        <div class="cust-card">
+            <div class="cust-badge">⚙️ Replace</div>
+            <div class="cust-file">intel/governance-intel.md</div>
+            <div class="cust-desc">Topic-specific Databricks doc links. Swap with links for your area: AI/BI, Lakeflow, GenAI, Compute, Security, or Apps.</div>
+        </div>
+        <div class="cust-card">
+            <div class="cust-badge">⚙️ Replace</div>
+            <div class="cust-file">intel/db-data.md</div>
+            <div class="cust-desc">Logfood schemas and workspace URLs. Add your team's tables and fill in Part 2 (workspace access) with your specific environment.</div>
+        </div>
+        <div class="cust-card">
+            <div class="cust-badge">⚙️ Replace</div>
+            <div class="cust-file">agents/agent-competitive.md</div>
+            <div class="cust-desc">Competitor table. Update the key competitor list for your area (AI/BI, Pipelines, MLOps, GenAI, etc.).</div>
+        </div>
+    </div>
+    <p class="note">Full walkthrough with step-by-step instructions → <code>skill/CUSTOMIZE.md</code></p>
+</section>
+</div>
+
+<!-- ── Footer ────────────────────────────────────────────────────── -->
+<footer>
+    <div class="container">
+        <p>Research Skill for Databricks &middot; Built by <a href="#">Mudit Mittal</a> &middot; Questions or contributions → message on Slack or file a PR</p>
+    </div>
+</footer>
+
+<script>
+    function copyCode(id, btn) {
+        const el = document.getElementById(id);
+        // Get plain text, stripping leading/trailing whitespace
+        const text = el.innerText.trim();
+        navigator.clipboard.writeText(text).then(() => {
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        }).catch(() => {
+            // Fallback for file:// protocol
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            btn.textContent = 'Copied!';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = 'Copy';
+                btn.classList.remove('copied');
+            }, 2000);
+        });
+    }
+</script>
+</body>
+</html>
