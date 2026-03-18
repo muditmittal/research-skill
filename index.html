@@ -1187,11 +1187,11 @@
         <div class="step">
             <div class="step-num">1</div>
             <div>
-                <h3>Copy the skill to Claude Code</h3>
-                <p>Copy the <code style="font-family:var(--mono);color:var(--accent);font-size:0.77rem">skill/</code> folder into Claude Code's docs directory so it can be loaded at research time.</p>
+                <h3>Clone the repo and install the skill</h3>
+                <p>Clone the repository, then copy the <code style="font-family:var(--mono);color:var(--accent);font-size:0.77rem">skill/</code> folder into Claude Code's docs directory.</p>
                 <div class="code-wrap">
-                    <pre class="code-block" id="c1"><span class="cc"># Run from the repo root</span>
-cp -r skill/ ~/.cursor/docs/research/</pre>
+                    <pre class="code-block" id="c1"><span class="ck">git clone</span> <span class="cp">https://github.com/muditmittal/research-skill.git</span>
+<span class="ck">cp</span> -r research-skill/skill/ ~/.cursor/docs/research/</pre>
                     <button class="copy-btn" onclick="copyCode('c1',this)">Copy</button>
                 </div>
             </div>
